@@ -28,10 +28,15 @@
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ * This project is partialy based on Crow from https://github.com/dawikur/crow
+ * Copyright 2016, Dawid Kurek, <dawikur@gmail.com>
 */
 
 #include <ArduinoSTL.h> // from https://github.com/mike-matera/ArduinoSTL cin and cout disabled in ArduinoSTL.cpp
-#include "debounce.h"
+#include <HID.h>
+#include <Keyboard.h>
+#include "debounce.hpp"
 
 int LED1 = 10;
 int LED2 = 16;
@@ -45,17 +50,32 @@ int SW_1_UP = 6;
 std::vector<DebouncedButton> buttons;
 // the setup function runs once when you press reset or power the board
 void setup() {
-    pinMode(LED1, OUTPUT);
-    pinMode(LED2, OUTPUT);
-    pinMode(LED3, OUTPUT);
-    pinMode(LED4, OUTPUT);
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(LED4, OUTPUT);
 
-//    button1 = DebouncedButton(SW_1_DOWN, LED1);
-    buttons.push_back(DebouncedButton(SW_1_DOWN, LED1));
+//    button1 = DebouncedButton(SW_1_DOWN, LED1); 
+  buttons.push_back(DebouncedButton(SW_1_DOWN, LED1));
+    
+//copy from firmware.ino @ crow by Dawid Kurek <dawikur@gmail.com>
+  static HIDSubDescriptor customerNode(
+    Crow::Reports::CustomerDescriptor,
+    sizeof(Crow::Reports::CustomerDescriptor));
+  HID().AppendDescriptor(&customerNode);
+
+  static HIDSubDescriptor keyboardNode(
+    Crow::Reports::KeyboardDescriptor,
+    sizeof(Crow::Reports::KeyboardDescriptor));
+  HID().AppendDescriptor(&keyboardNode);
+
+  static HIDSubDescriptor pointerNode(Crow::Reports::PointerDescriptor,
+                                      sizeof(Crow::Reports::PointerDescriptor));
+  HID().AppendDescriptor(&pointerNode);
 }
 
 // the loop function runs over and over again forever
 void loop() {
-    buttons[0].loop();
+  buttons[0].loop();
 }
 
