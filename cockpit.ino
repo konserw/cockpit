@@ -33,31 +33,23 @@
  * Copyright 2016, Dawid Kurek, <dawikur@gmail.com>
 */
 
-#include <ArduinoSTL.h> // from https://github.com/mike-matera/ArduinoSTL cin and cout disabled in ArduinoSTL.cpp
-#include <HID.h>
 #include <Keyboard.h>
 #include "debounce.hpp"
 
-int LED1 = 10;
-int LED2 = 16;
-int LED3 = 14;
-int LED4 = 15;
+int SW1 = 3;
+int SW2 = 6;
 
-int SW_1_DOWN = 3;
-int SW_1_UP = 6;
+int joyPin1 = A0;
+int joyPin2 = A1;
 
-//DebouncedButton button1 = DebouncedButton(SW_1_DOWN, LED1);
-std::vector<DebouncedButton> buttons;
+DebouncedButton buttons[] = {DebouncedButton(SW1, 'L'), DebouncedButton(SW2, 'U')};
 // the setup function runs once when you press reset or power the board
 void setup() {
-  pinMode(LED1, OUTPUT);
-  pinMode(LED2, OUTPUT);
-  pinMode(LED3, OUTPUT);
-  pinMode(LED4, OUTPUT);
-
-//    button1 = DebouncedButton(SW_1_DOWN, LED1); 
-  buttons.push_back(DebouncedButton(SW_1_DOWN, LED1));
-    
+  Serial.begin(9600);
+  pinMode(joyPin1, INPUT);
+  pinMode(joyPin2, INPUT);
+  pinMode(15, INPUT);
+/*   
 //copy from firmware.ino @ crow by Dawid Kurek <dawikur@gmail.com>
   static HIDSubDescriptor customerNode(
     Crow::Reports::CustomerDescriptor,
@@ -72,10 +64,31 @@ void setup() {
   static HIDSubDescriptor pointerNode(Crow::Reports::PointerDescriptor,
                                       sizeof(Crow::Reports::PointerDescriptor));
   HID().AppendDescriptor(&pointerNode);
+  */
+  Keyboard.begin();
 }
+
+ int treatValue(int data) {
+  return (data * 9 / 1024);
+ }
 
 // the loop function runs over and over again forever
 void loop() {
-  buttons[0].loop();
+  for (auto&& button : buttons)
+    button.loop();
+
+  int value1, value2;
+    // reads the value of the variable resistor
+  value1 = analogRead(joyPin1);  
+  // this small pause is needed between reading
+  // analog pins, otherwise we get the same value twice
+  delay(100);            
+  // reads the value of the variable resistor
+  value2 = analogRead(joyPin2);  
+  Serial.print("J ");
+  Serial.print(treatValue(value1));
+  Serial.print("\t");
+  Serial.println(treatValue(value2));
+  delay(1000);
 }
 

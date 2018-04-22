@@ -54,17 +54,17 @@ class DebouncedButton
   int buttonPin;
   int buttonState;             // the current reading from the input pin
   int lastButtonState = LOW;   // the previous reading from the input pin
-  int ledPin;
+  char key;
   // the following variables are unsigned longs because the time, measured in
   // milliseconds, will quickly become a bigger number than can be stored in an int.
   unsigned long lastDebounceTime;  // the last time the output pin was toggled
   static const unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 public:
-  DebouncedButton(int pin, int ledpin) {
+  DebouncedButton(int pin, char _key) {
     buttonPin = pin;
-    pinMode(buttonPin, INPUT);
+    pinMode(buttonPin, INPUT_PULLUP);
     lastDebounceTime = 0;
-    ledPin = ledpin;
+    key = _key;
   }
 
   void loop() {
@@ -88,13 +88,10 @@ public:
     // if the button state has changed:
       if (reading != buttonState) {
         buttonState = reading;
-        //HERE take action
+        Serial.print(key);
+        Keyboard.print(key);
       }
     }
-
-    // set the LED:
-    digitalWrite(ledPin, buttonState);
-
     // save the reading. Next time through the loop, it'll be the lastButtonState:
     lastButtonState = reading;
   }
