@@ -35,20 +35,20 @@
 
 #include <Keyboard.h>
 #include "debounce.hpp"
+#include "Joy.hpp"
 
 int SW1 = 3;
-int SW2 = 6;
+int SW2 = 4;
 
-int joyPin1 = A0;
-int joyPin2 = A1;
-
-DebouncedButton buttons[] = {DebouncedButton(SW1, 'L'), DebouncedButton(SW2, 'U')};
+DebouncedButton buttons[] = {
+  DebouncedButton(SW1, 'L'), //Landing gear
+  DebouncedButton(SW2, '\'') //Lights
+};
+JoyController joy;
 // the setup function runs once when you press reset or power the board
 void setup() {
   Serial.begin(9600);
-  pinMode(joyPin1, INPUT);
-  pinMode(joyPin2, INPUT);
-  pinMode(15, INPUT);
+  Keyboard.begin();
 /*   
 //copy from firmware.ino @ crow by Dawid Kurek <dawikur@gmail.com>
   static HIDSubDescriptor customerNode(
@@ -65,30 +65,14 @@ void setup() {
                                       sizeof(Crow::Reports::PointerDescriptor));
   HID().AppendDescriptor(&pointerNode);
   */
-  Keyboard.begin();
-}
 
- int treatValue(int data) {
-  return (data * 9 / 1024);
- }
+}
 
 // the loop function runs over and over again forever
 void loop() {
   for (auto&& button : buttons)
     button.loop();
 
-  int value1, value2;
-    // reads the value of the variable resistor
-  value1 = analogRead(joyPin1);  
-  // this small pause is needed between reading
-  // analog pins, otherwise we get the same value twice
-  delay(100);            
-  // reads the value of the variable resistor
-  value2 = analogRead(joyPin2);  
-  Serial.print("J ");
-  Serial.print(treatValue(value1));
-  Serial.print("\t");
-  Serial.println(treatValue(value2));
-  delay(1000);
+  joy.loop();
 }
 
