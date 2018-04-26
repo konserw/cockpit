@@ -68,7 +68,7 @@ public:
         Serial.print(highKey);
         Keyboard.press(highKey);
       }
-      else if (state == JoyState::high) {
+      else if (state == JoyState::low) {
         Serial.print(lowKey);
         Keyboard.press(lowKey);
       }
@@ -81,9 +81,11 @@ class JoyController {
   static const int joyPin1 = A0;
   static const int joyPin2 = A1;
   static const int joyButton = 15;
-  static const char RIGHT = 'E';
-  static const char LEFT = 'Q';
-  static const char FWD = ']';
+  //static const char RIGHT = 'E';
+  //static const char LEFT = 'Q';
+  static const char RIGHT = '.';
+  static const char LEFT = ',';
+    static const char FWD = ']';
   static const char BACK = '[';
 
   JoyAxis x;
@@ -96,7 +98,7 @@ public:
   }
 
   JoyController() :
-  x(RIGHT, LEFT),
+  x(LEFT, RIGHT),
   y(FWD, BACK)
   {
     pinMode(joyPin1, INPUT);
