@@ -40,28 +40,40 @@ enum class JoyState { low, dead, high };
 
 class JoyAxis {
   static const int dead_zone = 1;
-  JoyState state;
   JoyState lastState;
   char lowKey;
   char highKey;
   int pin;
 public:
   JoyAxis(char _lowKey, char _highKey) {
-    state = JoyState::dead;
     lastState = JoyState::dead;
     lowKey = _lowKey;
     highKey = _highKey;
   }
 
   void loop(int value) {
+    JoyState state = JoyState::dead;
     if (value < -dead_zone) {
-      Serial.print(lowKey);
-      Keyboard.print(lowKey);
+      state = JoyState::low;
     }
     else if ( value > dead_zone) {
-      Serial.print(highKey);
-      Keyboard.print(highKey);
+      state = JoyState::high;
     }
+    if (state != lastState) {
+      if (lastState == JoyState::high)
+        Keyboard.release(highKey);
+      else if (lastState == JoyState::low)
+        Keyboard.release(lowKey);
+      if (state == JoyState::high) {
+        Serial.print(highKey);
+        Keyboard.press(highKey);
+      }
+      else if (state == JoyState::high) {
+        Serial.print(lowKey);
+        Keyboard.press(lowKey);
+      }
+    }
+    lastState = state;
   }
 };
 
